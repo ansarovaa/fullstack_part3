@@ -26,11 +26,11 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/info', (request, response) => {
-    let total = persons.reduce((sum) => {
-        return sum + 1
-    }, 0)
-    let time = new Date()
-    response.send(`Phonebook has info for ${total} people <br><br> ${time}`)
+    Person
+        .find({})
+        .then(persons => {
+            response.send(`Phonebook has info for ${persons.length} people <br><br> ${new Date()}`)
+        })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -49,12 +49,15 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
-    Person.findByIdAndRemove(request.params.id)
-      .then(result => {
-        response.status(204).end()
-      })
-      .catch(error => next(error))
-  })
+    Person
+        .findByIdAndRemove(request.params.id)
+        .then(result => {
+            response
+                .status(204)
+                .end()
+        })
+        .catch(error => next(error))
+})
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
@@ -77,6 +80,25 @@ app.post('/api/persons', (request, response) => {
         .save()
         .then(savedPerson => {
             response.json(savedPerson)
+        })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const {body} = request
+
+    return Person
+        .findOne({_id: request.params.id})
+        .then((personToBeUpdate) => {
+            const person = personToBeUpdate
+            person.name = body.name
+            person.number = body.number
+
+            person
+                .save()
+                .then((savedPerson) => {
+                    response.json(savedPerson.toJSON())
+                })
+                .catch((error) => next(error))
         })
 })
 
