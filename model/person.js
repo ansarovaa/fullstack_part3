@@ -23,7 +23,6 @@ mongoose
     name: {
         type: String,
         minlength: 3,
-        unique: true,
         required: true
     },
     number: {
