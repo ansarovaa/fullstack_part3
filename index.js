@@ -48,54 +48,13 @@ app.get('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
-
-    response
-        .status(204)
-        .end()
-})
-
-const generateId = () => {
-    const maxId = persons.length > 0
-        ? Math.max(...persons.map(n => n.id))
-        : 0
-    return maxId + 1
-}
-
-/*app.post('/api/persons', (request, response) => {
-    const body = request.body
-
-    if (!body.name) {
-        return response
-            .status(400)
-            .json({error: 'name missing'})
-    }
-
-    if (!body.number) {
-        return response
-            .status(400)
-            .json({error: 'number missing'})
-    }
-
-    let names = persons.map(name => name.name);
-    if (names.includes(body.name)) {
-        return response
-            .status(400)
-            .json({error: 'name must be unique'})
-    }
-
-    const person = {
-        name: body.name,
-        number: body.number,
-        id: generateId()
-    }
-
-    persons = persons.concat(person)
-
-    response.json(person)
-})*/
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndRemove(request.params.id)
+      .then(result => {
+        response.status(204).end()
+      })
+      .catch(error => next(error))
+  })
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
@@ -120,7 +79,6 @@ app.post('/api/persons', (request, response) => {
             response.json(savedPerson)
         })
 })
-
 
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
